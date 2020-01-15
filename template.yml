@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: measure-cold-start
+    Description: Measures cold start performance of Lambda functions
+    Author: Lumigo
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE
+    ReadmeUrl: README.md
+    Labels: ['lambda', 'performance', 'coldstart', 'devops']
+    HomePageUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
+    SemanticVersion: 1.1.0
+    SourceCodeUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
+
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    MemorySize: 128
+    Environment:
+      Variables:
+        LOG_LEVEL: INFO
+
+Resources:
+  Loop:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/functions/loop.handler
+      Timeout: 900
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - lambda:GetFunctionConfiguration
+              - lambda:UpdateFunctionConfiguration
+              - lambda:InvokeFunction
+            Resource: "*"
+
+  LoopLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Loop}
+
+  Analyze:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/functions/analyze.handler
+      Timeout: 600
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - logs:StartQuery
+              - logs:GetQueryResults
+            Resource: "*"
+
+  LoopLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${Analyze}
+
+  MeasureColdStartStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    DependsOn: 
+      - StateMachineRole
+    Properties:
+      DefinitionString:
+        !Sub
+          - "{\n  \"StartAt\": \"Loop\",\n  \"States\": {\n    \"Loop\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${LoopArn}\",\n      \"Next\": \"IsComplete\"\n    },\n    \"IsComplete\": {\n      \"Type\": \"Choice\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.count\",\n          \"NumericEquals\": 0,\n          \"Next\": \"Wait30Seconds\"\n        }\n      ],\n      \"Default\": \"Loop\"\n    },\n    \"Wait30Seconds\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 30,\n      \"Next\": \"Analyze\"\n    },\n    \"Analyze\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${AnalyzeArn}\",\n      \"End\": true\n    }\n  }\n}"
+          - LoopArn: !GetAtt Loop.Arn
+            AnalyzeArn: !GetAtt Analyze.Arn
+      RoleArn: !GetAtt StateMachineRole.Arn
+  
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.us-east-1.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt Loop.Arn
+                  - !GetAtt Analyze.Arn            
+
+Outputs:
+  StateMachineARN:
+    Description: ARN of the state machine
+    Value: !Ref MeasureColdStartStateMachine
