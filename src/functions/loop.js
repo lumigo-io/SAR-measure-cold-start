@@ -4,7 +4,9 @@ const AWS = require("aws-sdk");
 const Lambda = new AWS.Lambda();
 
 module.exports.handler = async (input, context) => {  
-	const { functionName, count, payload } = input;
+	const functionName = input.functionName;
+	const payload = input.payload || {};
+	const count = input.count || 100; // default to 100 iterations
 	input.startTime = input.startTime || Date.now();
 
 	let done = 0;
@@ -34,7 +36,7 @@ const updateEnvVar = async (functionName) => {
 	await Lambda.updateFunctionConfiguration(req).promise();
 };
 
-const invoke = async (functionName, payload = {}) => {
+const invoke = async (functionName, payload) => {
 	Log.debug("invoking", { functionName });
 	const req = {
 		FunctionName: functionName,

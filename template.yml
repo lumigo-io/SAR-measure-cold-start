@@ -11,7 +11,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['lambda', 'performance', 'coldstart', 'devops']
     HomePageUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
-    SemanticVersion: 1.1.0
+    SemanticVersion: 1.2.0
     SourceCodeUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
 
 Globals:
