@@ -11,7 +11,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['lambda', 'performance', 'coldstart', 'devops']
     HomePageUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
-    SemanticVersion: 1.2.0
+    SemanticVersion: 1.2.1
     SourceCodeUrl: https://github.com/lumigo-io/SAR-measure-cold-start.git
 
 Globals:
@@ -67,7 +67,7 @@ Resources:
     Properties:
       DefinitionString:
         !Sub
-          - "{\n  \"StartAt\": \"Loop\",\n  \"States\": {\n    \"Loop\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${LoopArn}\",\n      \"Next\": \"IsComplete\"\n    },\n    \"IsComplete\": {\n      \"Type\": \"Choice\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.count\",\n          \"NumericEquals\": 0,\n          \"Next\": \"Wait30Seconds\"\n        }\n      ],\n      \"Default\": \"Loop\"\n    },\n    \"Wait30Seconds\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 30,\n      \"Next\": \"Analyze\"\n    },\n    \"Analyze\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${AnalyzeArn}\",\n      \"End\": true\n    }\n  }\n}"
+          - "{\n  \"StartAt\": \"Loop\",\n  \"States\": {\n    \"Loop\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${LoopArn}\",\n      \"Next\": \"IsComplete\"\n    },\n    \"IsComplete\": {\n      \"Type\": \"Choice\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.count\",\n          \"NumericEquals\": 0,\n          \"Next\": \"Wait30Seconds\"\n        }\n      ],\n      \"Default\": \"Loop\"\n    },\n    \"Wait60Seconds\": {\n      \"Type\": \"Wait\",\n      \"Seconds\": 60,\n      \"Next\": \"Analyze\"\n    },\n    \"Analyze\": {\n      \"Type\": \"Task\",\n      \"Resource\": \"${AnalyzeArn}\",\n      \"End\": true\n    }\n  }\n}"
           - LoopArn: !GetAtt Loop.Arn
             AnalyzeArn: !GetAtt Analyze.Arn
       RoleArn: !GetAtt StateMachineRole.Arn
