@@ -10,9 +10,9 @@ fields @memorySize / 1000000 as memorySize
   | parse @log /^.*\\/aws\\/lambda\\/(?<functionName>.*)/
   | stats count() as coldStarts, 
           min(initDuration) as min,
-          percentile(initDuration, 25) as fstQuartile,
+          percentile(initDuration, 25) as p25,
           median(initDuration) as median, 
-          percentile(initDuration, 75) as trdQuartile,
+          percentile(initDuration, 75) as p75,
           percentile(initDuration, 95) as p95,
           max(initDuration) as max,
           stddev(initDuration) as stddev
