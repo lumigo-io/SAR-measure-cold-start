@@ -4,8 +4,8 @@ const AWS = require("aws-sdk");
 const Lambda = new AWS.Lambda();
 
 module.exports.handler = async (input, context) => {  
-  const functionName = input.functionName;
-  const envVars = await getEnvVars(functionName)
+	const functionName = input.functionName;
+	const envVars = await getEnvVars(functionName);
 	const payload = input.payload || {};
 	const count = input.count || 100; // default to 100 iterations
 	input.startTime = input.startTime || Date.now();
@@ -25,17 +25,17 @@ module.exports.handler = async (input, context) => {
 };
 
 const getEnvVars = async (functionName) => {
-  Log.debug("getting current env variables", { functionName });
-  const resp = await Lambda.getFunctionConfiguration({
-    FunctionName: functionName
-  }).promise()
+	Log.debug("getting current env variables", { functionName });
+	const resp = await Lambda.getFunctionConfiguration({
+		FunctionName: functionName
+	}).promise();
 
-  return resp.Environment || { Variables: {} }
-}
+	return resp.Environment || { Variables: {} };
+};
 
 const updateEnvVar = async (functionName, envVars) => {
 	Log.debug("touching environment variable", { functionName });
-  envVars.Variables['uuid'] = uuid()
+	envVars.Variables["uuid"] = uuid();
 
 	const req = {
 		FunctionName: functionName,
