@@ -6,7 +6,7 @@ const Lambda = new AWS.Lambda();
 module.exports.handler = async (input, context) => {  
 	const functionName = input.functionName;
 	const envVars = await getEnvVars(functionName);
-	const payload = input.payload || {};
+	const payload = input.payload || "{}";
 	const count = input.count || 100; // default to 100 iterations
 	input.startTime = input.startTime || Date.now();
 
@@ -49,7 +49,7 @@ const invoke = async (functionName, payload) => {
 	const req = {
 		FunctionName: functionName,
 		InvocationType: "RequestResponse",
-		Payload: JSON.stringify(payload)
+		Payload: payload
 	};
 	await Lambda.invoke(req).promise();
 };
