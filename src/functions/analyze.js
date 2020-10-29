@@ -6,16 +6,15 @@ const Retry = require("async-retry");
 const queryString = `
 fields @memorySize / 1000000 as memorySize
   | filter @message like /(?i)(Init Duration)/
-  | parse @message /^REPORT.*Init Duration: (?<initDuration>.*) ms.*/
   | parse @log /^.*\\/aws\\/lambda\\/(?<functionName>.*)/
   | stats count() as coldStarts, 
-          min(initDuration) as min,
-          percentile(initDuration, 25) as p25,
-          median(initDuration) as median, 
-          percentile(initDuration, 75) as p75,
-          percentile(initDuration, 95) as p95,
-          max(initDuration) as max,
-          stddev(initDuration) as stddev
+          min(@initDuration + @duration) as min,
+          percentile(@initDuration + @duration, 25) as p25,
+          median(@initDuration + @duration) as median, 
+          percentile(@initDuration + @duration, 75) as p75,
+          percentile(@initDuration + @duration, 95) as p95,
+          max(@initDuration + @duration) as max,
+          stddev(@initDuration + @duration) as stddev
     by functionName, memorySize`;
 
 module.exports.handler = async ({ startTime, functionName }) => {
@@ -61,6 +60,7 @@ module.exports.handler = async ({ startTime, functionName }) => {
 
 	return {
 		functionName,
+		note: "The values include both DURATION as well as INIT DURATION",
 		result
 	};
 };

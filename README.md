@@ -1,6 +1,6 @@
 # measure-cold-start
 
-[![Version](https://img.shields.io/badge/semver-1.3.3-blue)](template.yml)
+[![Version](https://img.shields.io/badge/semver-1.4.0-blue)](template.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 This is an AWS Step Functions state machine that helps you measure the initialization time (or `Init Duration` in the REPORT log messages) of your Lambda functions. The initializatoin time is the time it takes to initialize the function module before Lambda is able to invoke the handler method.
