@@ -26,6 +26,10 @@ coverage
 # vscode folders
 .vscode/
 
+# IntelliJ
+.idea/
+*.iml
+
 # dstore
 .DS_Store
 

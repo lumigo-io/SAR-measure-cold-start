@@ -2,8 +2,9 @@ const uuid = require("uuid/v4");
 const Log = require("@dazn/lambda-powertools-logger");
 const AWS = require("aws-sdk");
 const Lambda = new AWS.Lambda();
+const Retry = require("async-retry");
 
-module.exports.handler = async (input, context) => {  
+module.exports.handler = async (input, context) => {
 	const functionName = input.functionName;
 	const envVars = await getEnvVars(functionName);
 	const payload = input.payload || "{}";
@@ -41,7 +42,15 @@ const updateEnvVar = async (functionName, envVars) => {
 		FunctionName: functionName,
 		Environment: envVars
 	};
-	await Lambda.updateFunctionConfiguration(req).promise();
+	await Retry(
+		async () => {
+			await Lambda.updateFunctionConfiguration(req).promise();
+		}, {
+			retries: 5,
+			minTimeout: 100,
+			maxTimeout: 1000
+		}
+	);
 };
 
 const invoke = async (functionName, payload) => {
