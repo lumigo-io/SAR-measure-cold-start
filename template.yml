@@ -35,6 +35,7 @@ Resources:
               - lambda:GetFunctionConfiguration
               - lambda:UpdateFunctionConfiguration
               - lambda:InvokeFunction
+              - lambda:GetFunction
             Resource: "*"
 
   LoopLogGroup:
