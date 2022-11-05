@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/badge/semver-1.4.1-blue)](template.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-This is an AWS Step Functions state machine that helps you measure the initialization time (or `Init Duration` in the REPORT log messages) of your Lambda functions. The initializatoin time is the time it takes to initialize the function module before Lambda is able to invoke the handler method.
+This is an AWS Step Functions state machine that helps you measure the initialization time (or `Init Duration` in the REPORT log messages) of your Lambda functions. The initialization time is the time it takes to initialize the function module before Lambda is able to invoke the handler method.
 
 The state machine is language agnostic. You can give it any function as input and the state machine will invoke it multiple times whilst inducing a cold start for each invocation by changing an environment variable value. It will then analyze the function's logs and report the following data points.
 
