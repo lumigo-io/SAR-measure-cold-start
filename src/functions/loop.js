@@ -42,6 +42,7 @@ const updateEnvVar = async (functionName, envVars) => {
 		Environment: envVars
 	};
 	await Lambda.updateFunctionConfiguration(req).promise();
+  await Lambda.waitFor("functionUpdatedV2", {FunctionName: functionName,}).promise();
 };
 
 const invoke = async (functionName, payload) => {
