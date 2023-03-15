@@ -43,9 +43,9 @@ const updateEnvVar = async (functionName, envVars) => {
 	};
 	await client.updateFunctionConfiguration(req);
 	await waitUntilFunctionUpdatedV2({
-    client: client,
-    maxWaitTime: 200
-  }, { FunctionName: functionName });
+		client: client,
+		maxWaitTime: 200
+	}, { FunctionName: functionName });
 };
 
 const invoke = async (functionName, payload) => {
