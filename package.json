@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/lumigo-io/SAR-measure-cold-start#readme",
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.292.0",
+    "@aws-sdk/client-lambda": "^3.292.0",
     "@dazn/lambda-powertools-logger": "^1.15.2",
     "async-retry": "^1.3.1",
     "lodash": "^4.17.15",
