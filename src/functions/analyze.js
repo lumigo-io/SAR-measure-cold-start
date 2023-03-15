@@ -1,7 +1,5 @@
 const _ = require("lodash");
-const {
-    CloudWatchLogs
-} = require("@aws-sdk/client-cloudwatch-logs");
+const { CloudWatchLogs } = require("@aws-sdk/client-cloudwatch-logs");
 const CloudWatchLogs = new CloudWatchLogs();
 const Retry = require("async-retry");
 

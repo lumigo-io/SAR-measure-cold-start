@@ -1,9 +1,6 @@
 const uuid = require("uuid/v4");
 const Log = require("@dazn/lambda-powertools-logger");
-const {
-    Lambda,
-    waitUntilFunctionUpdatedV2
-} = require("@aws-sdk/client-lambda");
+const { Lambda, waitUntilFunctionUpdatedV2 } = require("@aws-sdk/client-lambda");
 const Lambda = new Lambda();
 
 module.exports.handler = async (input, context) => {  
@@ -46,9 +43,9 @@ const updateEnvVar = async (functionName, envVars) => {
 	};
 	await Lambda.updateFunctionConfiguration(req);
 	await waitUntilFunctionUpdatedV2({
-        client: Lambda,
-        maxWaitTime: 200
-    }, {FunctionName: functionName,});
+    client: Lambda,
+    maxWaitTime: 200
+  }, { FunctionName: functionName });
 };
 
 const invoke = async (functionName, payload) => {
