@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const { CloudWatchLogs } = require("@aws-sdk/client-cloudwatch-logs");
-const CloudWatchLogs = new CloudWatchLogs();
+const client = new CloudWatchLogs();
 const Retry = require("async-retry");
 
 const queryString = `
@@ -20,7 +20,7 @@ fields @memorySize / 1000000 as memorySize
 module.exports.handler = async ({ startTime, functionName }) => {
 	const endTime = new Date();
 	const logGroupNames = [`/aws/lambda/${functionName}`];
-	const startResp = await CloudWatchLogs.startQuery({
+	const startResp = await client.startQuery({
 		logGroupNames,
 		startTime: new Date(startTime).getTime() / 1000,
 		endTime: endTime.getTime() / 1000,
@@ -30,7 +30,7 @@ module.exports.handler = async ({ startTime, functionName }) => {
 	const queryId = startResp.queryId;
 	const rows = await Retry(
 		async () => {
-			const resp = await CloudWatchLogs.getQueryResults({
+			const resp = await client.getQueryResults({
 				queryId
 			});
 
