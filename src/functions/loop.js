@@ -1,7 +1,10 @@
 const uuid = require("uuid/v4");
 const Log = require("@dazn/lambda-powertools-logger");
-const AWS = require("aws-sdk");
-const Lambda = new AWS.Lambda();
+const {
+    Lambda,
+    waitUntilFunctionUpdatedV2
+} = require("@aws-sdk/client-lambda");
+const Lambda = new Lambda();
 
 module.exports.handler = async (input, context) => {  
 	const functionName = input.functionName;
@@ -28,7 +31,7 @@ const getEnvVars = async (functionName) => {
 	Log.debug("getting current env variables", { functionName });
 	const resp = await Lambda.getFunctionConfiguration({
 		FunctionName: functionName
-	}).promise();
+	});
 
 	return resp.Environment || { Variables: {} };
 };
@@ -41,8 +44,11 @@ const updateEnvVar = async (functionName, envVars) => {
 		FunctionName: functionName,
 		Environment: envVars
 	};
-	await Lambda.updateFunctionConfiguration(req).promise();
-	await Lambda.waitFor("functionUpdatedV2", {FunctionName: functionName,}).promise();
+	await Lambda.updateFunctionConfiguration(req);
+	await waitUntilFunctionUpdatedV2({
+        client: Lambda,
+        maxWaitTime: 200
+    }, {FunctionName: functionName,});
 };
 
 const invoke = async (functionName, payload) => {
@@ -52,5 +58,5 @@ const invoke = async (functionName, payload) => {
 		InvocationType: "RequestResponse",
 		Payload: payload
 	};
-	await Lambda.invoke(req).promise();
+	await Lambda.invoke(req);
 };

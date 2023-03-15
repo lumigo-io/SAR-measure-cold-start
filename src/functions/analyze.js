@@ -1,6 +1,8 @@
 const _ = require("lodash");
-const AWS = require("aws-sdk");
-const CloudWatchLogs = new AWS.CloudWatchLogs();
+const {
+    CloudWatchLogs
+} = require("@aws-sdk/client-cloudwatch-logs");
+const CloudWatchLogs = new CloudWatchLogs();
 const Retry = require("async-retry");
 
 const queryString = `
@@ -25,14 +27,14 @@ module.exports.handler = async ({ startTime, functionName }) => {
 		startTime: new Date(startTime).getTime() / 1000,
 		endTime: endTime.getTime() / 1000,
 		queryString
-	}).promise();
+	});
 
 	const queryId = startResp.queryId;
 	const rows = await Retry(
 		async () => {
 			const resp = await CloudWatchLogs.getQueryResults({
 				queryId
-			}).promise();
+			});
 
 			if (resp.status !== "Complete") {
 				throw new Error("query result not ready yet...");
